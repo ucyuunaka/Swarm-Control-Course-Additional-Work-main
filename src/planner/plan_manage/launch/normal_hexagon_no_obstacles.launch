@@ -49,6 +49,7 @@
 
         <arg name="target_x" value="26.0"/>
         <arg name="target_y" value="0.0"/>
+        <arg name="target_z" value="1.0"/>
 
         <arg name="map_size_x"              value="$(arg map_size_x)"/>
         <arg name="map_size_y"              value="$(arg map_size_y)"/>
@@ -67,6 +68,7 @@
 
         <arg name="target_x" value="28.6"/>
         <arg name="target_y" value="-1.5"/>
+        <arg name="target_z" value="1.0"/>
 
         <arg name="map_size_x"              value="$(arg map_size_x)"/>
         <arg name="map_size_y"              value="$(arg map_size_y)"/>
@@ -84,6 +86,7 @@
 
         <arg name="target_x" value="26.0"/>
         <arg name="target_y" value="-3.0"/>
+        <arg name="target_z" value="1.0"/>
 
         <arg name="map_size_x"              value="$(arg map_size_x)"/>
         <arg name="map_size_y"              value="$(arg map_size_y)"/>
@@ -101,6 +104,7 @@
 
         <arg name="target_x" value="23.4"/>
         <arg name="target_y" value="-1.5"/>
+        <arg name="target_z" value="1.0"/>
 
         <arg name="map_size_x"              value="$(arg map_size_x)"/>
         <arg name="map_size_y"              value="$(arg map_size_y)"/>
@@ -118,6 +122,7 @@
 
         <arg name="target_x" value="23.4"/>
         <arg name="target_y" value="1.5"/>
+        <arg name="target_z" value="1.0"/>
 
         <arg name="map_size_x"              value="$(arg map_size_x)"/>
         <arg name="map_size_y"              value="$(arg map_size_y)"/>
@@ -135,6 +140,7 @@
 
         <arg name="target_x" value="26.0"/>
         <arg name="target_y" value="3.0"/>
+        <arg name="target_z" value="1.0"/>
 
         <arg name="map_size_x"              value="$(arg map_size_x)"/>
         <arg name="map_size_y"              value="$(arg map_size_y)"/>
@@ -152,6 +158,7 @@
         
         <arg name="target_x" value="28.6"/>
         <arg name="target_y" value="1.5"/>
+        <arg name="target_z" value="1.0"/>
 
         <arg name="map_size_x"              value="$(arg map_size_x)"/>
         <arg name="map_size_y"              value="$(arg map_size_z)"/>
@@ -168,6 +175,7 @@
         
         <arg name="target_x" value="27.0"/>
         <arg name="target_y" value="0.0"/>
+        <arg name="target_z" value="1.0"/>
 
         <arg name="map_size_x"              value="$(arg map_size_x)"/>
         <arg name="map_size_y"              value="$(arg map_size_y)"/>
