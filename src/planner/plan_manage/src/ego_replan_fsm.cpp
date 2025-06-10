@@ -351,7 +351,7 @@ namespace ego_planner
         if (dist < CLEARANCE)
         {
           ROS_WARN("swarm distance between drone %d and drone %d is %f, too close!",
-                   planner_manager_->pp_.drone_id, id, dist);
+                   planner_manager_->pp_.drone_id, (int)id, dist);
           t_temp = t;
           occ = true;
           break;
@@ -655,9 +655,9 @@ namespace ego_planner
 
     int id = planner_manager_->pp_.drone_id;
 
-    if (id >= (int)swarm_relative_pts_.size())
+    if (id >= 8)
     {
-      ROS_ERROR("Drone ID %d is out of bounds for relative points vector size %ld", id, swarm_relative_pts_.size());
+      ROS_ERROR("Drone ID %d is out of bounds for relative points vector size %d", id, 8);
       return;
     }
 
