@@ -199,7 +199,6 @@ namespace ego_planner
     /*** STEP 1: INIT ***/
     double ts = pp_.polyTraj_piece_length / pp_.max_vel_;
 
-   
     poly_traj::MinJerkOpt initMJO;
     if (!computeInitReferenceState(start_pt, start_vel, start_acc,
                                    local_target_pt, local_target_vel,
@@ -207,7 +206,6 @@ namespace ego_planner
     {
       return false;
     }
-
 
     Eigen::MatrixXd cstr_pts = initMJO.getInitConstrainPoints(ploy_traj_opt_->get_cps_num_prePiece_());
     ploy_traj_opt_->setControlPoints(cstr_pts);
@@ -235,7 +233,7 @@ namespace ego_planner
     flag_success = ploy_traj_opt_->OptimizeTrajectory_lbfgs(headState, tailState,
                                                             innerPts, initTraj.getDurations(),
                                                             cstr_pts, use_formation);
- 
+
     t_opt = ros::Time::now() - t_start;
 
     if (!flag_success)
@@ -364,6 +362,14 @@ namespace ego_planner
     traj_.setGlobalTraj(globalMJO.getTraj(), time_now.toSec());
 
     return true;
+  }
+
+  void EGOPlannerManager::setFormationFromConfig(const std::vector<std::vector<double>> &relative_positions)
+  {
+    if (ploy_traj_opt_ != nullptr)
+    {
+      ploy_traj_opt_->setDesiredFormationFromConfig(relative_positions);
+    }
   }
 
 } // namespace ego_planner

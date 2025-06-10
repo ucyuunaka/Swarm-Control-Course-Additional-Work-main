@@ -161,7 +161,7 @@ namespace ego_planner
 
   void PlanningVisualization::drone_6_odomeCallback(const nav_msgs::OdometryConstPtr &msg)
   {
-    if (formation_size_ <= 5)
+    if (formation_size_ <= 6)
       return;
 
     swarm_odom[6] << msg->pose.pose.position.x, msg->pose.pose.position.y, msg->pose.pose.position.z;
