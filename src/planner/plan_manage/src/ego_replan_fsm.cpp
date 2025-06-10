@@ -1,5 +1,3 @@
-
-
 #include <plan_manage/ego_replan_fsm.h>
 
 namespace ego_planner
@@ -653,9 +651,15 @@ namespace ego_planner
     bool success = false;
     swarm_central_pos_(0) = msg->pose.position.x;
     swarm_central_pos_(1) = msg->pose.position.y;
-    swarm_central_pos_(2) = 0.5;
+    swarm_central_pos_(2) = 1.0;
 
     int id = planner_manager_->pp_.drone_id;
+
+    if (id >= (int)swarm_relative_pts_.size())
+    {
+      ROS_ERROR("Drone ID %d is out of bounds for relative points vector size %ld", id, swarm_relative_pts_.size());
+      return;
+    }
 
     Eigen::Vector3d relative_pos;
     relative_pos << swarm_relative_pts_[id][0],
@@ -693,7 +697,6 @@ namespace ego_planner
       else if (exec_state_ == EXEC_TRAJ)
         changeFSMExecState(REPLAN_TRAJ, "TRIG");
 
-      // visualization_->displayGoalPoint(end_pt_, Eigen::Vector4d(1, 0, 0, 1), 0.3, 0);
       visualization_->displayGlobalPathList(gloabl_traj, 0.1, 0);
     }
     else
@@ -701,6 +704,7 @@ namespace ego_planner
       ROS_ERROR("Unable to generate global trajectory!");
     }
   }
+
   void EGOReplanFSM::planGlobalTrajbyGivenWps()
   {
     std::vector<Eigen::Vector3d> wps;
