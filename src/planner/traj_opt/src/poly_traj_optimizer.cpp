@@ -751,7 +751,6 @@ namespace ego_planner
 
     // setDesiredFormation(formation_type_);
     swarm_graph_.reset(new SwarmGraph);
-    swarm_graph_->setGraph(formation_size_);
     // swarm_graph_->debug();
 
     string str_dir;

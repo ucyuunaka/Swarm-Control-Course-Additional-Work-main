@@ -83,6 +83,7 @@ namespace ego_planner
     double swarm_clearance_;   // safe distance between uav and uav
     double max_vel_, max_acc_; // dynamic limits
 
+    bool record_opt_;
     int formation_type_;
     int formation_size_;
     bool use_formation_ = true;
