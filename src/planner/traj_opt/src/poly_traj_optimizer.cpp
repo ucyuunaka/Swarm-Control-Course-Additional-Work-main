@@ -749,8 +749,7 @@ namespace ego_planner
     nh.param("optimization/record_opt", record_opt_, false);
     nh.param("optimization/constrain_points_perPiece", cps_num_prePiece_, 0);
 
-    setDesiredFormation(formation_type_);
-    // swarm_graph_->debug();
+    swarm_graph_.reset(new SwarmGraph);
 
     string str_dir;
     nh.param("fsm/result_file", str_dir, string(""));
