@@ -129,7 +129,10 @@ namespace ego_planner
     {
       central_goal = nh.subscribe("/move_base_simple/goal", 1, &EGOReplanFSM::formationWaypointCallback, this);
     }
-    cout << "Wrong target_type_ value! target_type_=" << target_type_ << endl;
+    else
+    {
+      cout << "Wrong target_type_ value! target_type_=" << target_type_ << endl;
+    }
   }
 
   void EGOReplanFSM::execFSMCallback(const ros::TimerEvent &e)
@@ -655,6 +658,9 @@ namespace ego_planner
 
     int id = planner_manager_->pp_.drone_id;
 
+    cout << "[DEBUG] Drone " << id << " received formation waypoint: central_pos=("
+         << swarm_central_pos_(0) << ", " << swarm_central_pos_(1) << ", " << swarm_central_pos_(2) << ")" << endl;
+
     if (id >= 8)
     {
       ROS_ERROR("Drone ID %d is out of bounds for relative points vector size %d", id, 8);
@@ -665,7 +671,13 @@ namespace ego_planner
     relative_pos << swarm_relative_pts_[id][0],
         swarm_relative_pts_[id][1],
         swarm_relative_pts_[id][2];
+
+    cout << "[DEBUG] Drone " << id << " relative_pos=(" << relative_pos(0) << ", " << relative_pos(1) << ", " << relative_pos(2)
+         << "), scale=" << swarm_scale_ << endl;
+
     end_pt_ = swarm_central_pos_ + swarm_scale_ * relative_pos;
+
+    cout << "[DEBUG] Drone " << id << " calculated target: end_pt_=(" << end_pt_(0) << ", " << end_pt_(1) << ", " << end_pt_(2) << ")" << endl;
 
     std::vector<Eigen::Vector3d> one_pt_wps;
     one_pt_wps.push_back(end_pt_);
@@ -673,6 +685,8 @@ namespace ego_planner
     success = planner_manager_->planGlobalTrajWaypoints(
         odom_pos_, odom_vel_, Eigen::Vector3d::Zero(),
         one_pt_wps, Eigen::Vector3d::Zero(), Eigen::Vector3d::Zero());
+
+    cout << "[DEBUG] Drone " << id << " planning success: " << (success ? "true" : "false") << endl;
 
     visualization_->displayGoalPoint(end_pt_, Eigen::Vector4d(0, 0.5, 0.5, 1), 0.3, 0);
 
