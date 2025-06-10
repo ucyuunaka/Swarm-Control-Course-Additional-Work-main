@@ -6,6 +6,7 @@
 #include <sensor_msgs/Imu.h>
 #include <uav_utils/geometry_utils.h>
 #include <boost/bind.hpp>
+#include <boost/function.hpp>
 
 typedef struct _Control
 {
@@ -179,8 +180,8 @@ cmd_callback(const quadrotor_msgs::SO3Command::ConstPtr &cmd, Command *command)
 }
 
 static void
-force_disturbance_callback(const geometry_msgs::Vector3::ConstPtr &f,
-                           Disturbance *disturbance)
+disturb_callback(const geometry_msgs::Vector3::ConstPtr &f,
+                 Disturbance *disturbance)
 {
   disturbance->f(0) = f->x;
   disturbance->f(1) = f->y;
@@ -188,8 +189,8 @@ force_disturbance_callback(const geometry_msgs::Vector3::ConstPtr &f,
 }
 
 static void
-moment_disturbance_callback(const geometry_msgs::Vector3::ConstPtr &m,
-                            Disturbance *disturbance)
+disturb_moment_callback(const geometry_msgs::Vector3::ConstPtr &m,
+                        Disturbance *disturbance)
 {
   disturbance->m(0) = m->x;
   disturbance->m(1) = m->y;
@@ -208,13 +209,24 @@ int main(int argc, char **argv)
 
   ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>("odom", 100);
   ros::Publisher imu_pub = n.advertise<sensor_msgs::Imu>("imu", 10);
+
+  boost::function<void(const quadrotor_msgs::SO3Command::ConstPtr &)> cmd_callback_bound =
+      boost::bind(cmd_callback, _1, &command);
   ros::Subscriber cmd_sub =
-      n.subscribe("cmd", 100, boost::bind(cmd_callback, _1, &command), ros::TransportHints().tcpNoDelay());
-  ros::Subscriber f_sub =
-      n.subscribe("force_disturbance", 100, boost::bind(force_disturbance_callback, _1, &disturbance),
+      n.subscribe("cmd", 100, cmd_callback_bound, ros::TransportHints().tcpNoDelay());
+
+  boost::function<void(const geometry_msgs::Vector3::ConstPtr &)> disturb_callback_bound =
+      boost::bind(disturb_callback, _1, &disturbance);
+  ros::Subscriber disturb_sub =
+      n.subscribe("force_disturbance", 100,
+                  disturb_callback_bound,
                   ros::TransportHints().tcpNoDelay());
-  ros::Subscriber m_sub =
-      n.subscribe("moment_disturbance", 100, boost::bind(moment_disturbance_callback, _1, &disturbance),
+
+  boost::function<void(const geometry_msgs::Vector3::ConstPtr &)> disturb_moment_callback_bound =
+      boost::bind(disturb_moment_callback, _1, &disturbance);
+  ros::Subscriber disturb_moment_sub =
+      n.subscribe("moment_disturbance", 100,
+                  disturb_moment_callback_bound,
                   ros::TransportHints().tcpNoDelay());
 
   QuadrotorSimulator::Quadrotor quad;
