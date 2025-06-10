@@ -277,14 +277,14 @@ namespace ego_planner
 
       case FORMATION_TYPE::LETTER_U:
       {
-        Eigen::Vector3d v0(-1.5, 2.0, 0.0); 
-        Eigen::Vector3d v1(-1.5, 0.5, 0.0);  
-        Eigen::Vector3d v2(-1.2, -1.0, 0.0); 
-        Eigen::Vector3d v3(-0.6, -2.0, 0.0); 
-        Eigen::Vector3d v4(0.6, -2.0, 0.0); 
-        Eigen::Vector3d v5(1.2, -1.0, 0.0); 
-        Eigen::Vector3d v6(1.5, 0.5, 0.0); 
-        Eigen::Vector3d v7(1.5, 2.0, 0.0); 
+        Eigen::Vector3d v0(-1.5, 2.0, 0.0);
+        Eigen::Vector3d v1(-1.5, 0.5, 0.0);
+        Eigen::Vector3d v2(-1.2, -1.0, 0.0);
+        Eigen::Vector3d v3(-0.6, -2.0, 0.0);
+        Eigen::Vector3d v4(0.6, -2.0, 0.0);
+        Eigen::Vector3d v5(1.2, -1.0, 0.0);
+        Eigen::Vector3d v6(1.5, 0.5, 0.0);
+        Eigen::Vector3d v7(1.5, 2.0, 0.0);
 
         swarm_des.push_back(v0);
         swarm_des.push_back(v1);
