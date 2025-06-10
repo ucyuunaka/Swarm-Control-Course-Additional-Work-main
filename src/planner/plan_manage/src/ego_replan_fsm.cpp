@@ -49,7 +49,7 @@ namespace ego_planner
       nh.param("fsm/target" + to_string(i) + "_z", goalpoints_[i][2], -1.0);
     }
 
-    for (int i = 0; i < 7; i++)
+    for (int i = 0; i < 8; i++)
     {
       nh.param("global_goal/relative_pos_" + to_string(i) + "/x", swarm_relative_pts_[i][0], -1.0);
       nh.param("global_goal/relative_pos_" + to_string(i) + "/y", swarm_relative_pts_[i][1], -1.0);
@@ -627,7 +627,7 @@ namespace ego_planner
       }
     }
   }
-  
+
   void EGOReplanFSM::formationWaypointCallback(const geometry_msgs::PoseStampedPtr &msg)
   {
     if (msg->pose.position.z < -0.1)
@@ -645,13 +645,12 @@ namespace ego_planner
 
     Eigen::Vector3d relative_pos;
     relative_pos << swarm_relative_pts_[id][0],
-                    swarm_relative_pts_[id][1],
-                    swarm_relative_pts_[id][2];
+        swarm_relative_pts_[id][1],
+        swarm_relative_pts_[id][2];
     end_pt_ = swarm_central_pos_ + swarm_scale_ * relative_pos;
 
     std::vector<Eigen::Vector3d> one_pt_wps;
     one_pt_wps.push_back(end_pt_);
-
 
     success = planner_manager_->planGlobalTrajWaypoints(
         odom_pos_, odom_vel_, Eigen::Vector3d::Zero(),
