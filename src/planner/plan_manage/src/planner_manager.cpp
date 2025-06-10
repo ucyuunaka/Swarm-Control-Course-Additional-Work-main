@@ -364,12 +364,4 @@ namespace ego_planner
     return true;
   }
 
-  void EGOPlannerManager::setFormationFromConfig(const std::vector<std::vector<double>> &relative_positions)
-  {
-    if (ploy_traj_opt_ != nullptr)
-    {
-      ploy_traj_opt_->setDesiredFormationFromConfig(relative_positions);
-    }
-  }
-
 } // namespace ego_planner
