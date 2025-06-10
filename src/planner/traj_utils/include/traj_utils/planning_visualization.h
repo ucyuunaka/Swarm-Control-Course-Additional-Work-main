@@ -42,8 +42,11 @@ namespace ego_planner
 
     enum FORMATION_TYPE
     {
-      NONE_FORMATION        = 0,
-      REGULAR_HEXAGON       = 1
+      NONE_FORMATION = 0,
+      REGULAR_HEXAGON = 1,
+      LETTER_S = 2,
+      LETTER_Y = 3,
+      LETTER_U = 4
     };
 
     int drone_id_;
@@ -51,8 +54,8 @@ namespace ego_planner
     int formation_size_, line_size_;
     std::vector<int> line_begin_, line_end_;
     bool start_visual_;
-    
-    ros::Subscriber drone_0_odom_sub_, drone_1_odom_sub_, drone_2_odom_sub_, drone_3_odom_sub_; 
+
+    ros::Subscriber drone_0_odom_sub_, drone_1_odom_sub_, drone_2_odom_sub_, drone_3_odom_sub_;
     ros::Subscriber drone_4_odom_sub_, drone_5_odom_sub_, drone_6_odom_sub_, drone_7_odom_sub_;
     ros::Subscriber drone_8_odom_sub_, drone_9_odom_sub_, drone_10_odom_sub_, drone_11_odom_sub_;
 
@@ -77,16 +80,19 @@ namespace ego_planner
     void drone_9_odomeCallback(const nav_msgs::OdometryConstPtr &msg);
     void drone_10_odomeCallback(const nav_msgs::OdometryConstPtr &msg);
     void drone_11_odomeCallback(const nav_msgs::OdometryConstPtr &msg);
-    
+
     void swarmGraphVisulCallback(const ros::TimerEvent &e);
     void benchmarkCallback(const ros::TimerEvent &e);
 
   public:
-
     PlanningVisualization(/* args */) {}
-    ~PlanningVisualization() { 
-      if (drone_id_ == 1){ odom_csv.close(); }
-     }
+    ~PlanningVisualization()
+    {
+      if (drone_id_ == 1)
+      {
+        odom_csv.close();
+      }
+    }
 
     PlanningVisualization(ros::NodeHandle &nh);
 
@@ -95,7 +101,7 @@ namespace ego_planner
     void initSwarmGraphVisual();
 
     void displayMarkerList(ros::Publisher &pub, const vector<Eigen::Vector3d> &list, double scale,
-                           Eigen::Vector4d color, int id,  bool show_sphere = true);
+                           Eigen::Vector4d color, int id, bool show_sphere = true);
     void generatePathDisplayArray(visualization_msgs::MarkerArray &array,
                                   const vector<Eigen::Vector3d> &list, double scale, Eigen::Vector4d color, int id);
     void generateArrowDisplayArray(visualization_msgs::MarkerArray &array,
