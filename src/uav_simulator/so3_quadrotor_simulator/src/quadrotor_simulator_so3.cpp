@@ -204,6 +204,7 @@ int main(int argc, char **argv)
 
   Command command;
   Disturbance disturbance;
+  memset(&command, 0, sizeof(command));
 
   ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>("odom", 100);
   ros::Publisher imu_pub = n.advertise<sensor_msgs::Imu>("imu", 10);
@@ -242,6 +243,7 @@ int main(int argc, char **argv)
   const double dt = 1 / simulation_rate;
 
   Control control;
+  memset(&control, 0, sizeof(control));
 
   nav_msgs::Odometry odom_msg;
   odom_msg.header.frame_id = "/world";
@@ -250,44 +252,39 @@ int main(int argc, char **argv)
   sensor_msgs::Imu imu;
   imu.header.frame_id = "/simulator";
 
-  /*
-  command.force[0] = 0;
-  command.force[1] = 0;
-  command.force[2] = quad.getMass()*quad.getGravity() + 0.1;
-  command.qx = 0;
-  command.qy = 0;
-  command.qz = 0;
-  command.qw = 1;
-  command.kR[0] = 2;
-  command.kR[1] = 2;
-  command.kR[2] = 2;
-  command.kOm[0] = 0.15;
-  command.kOm[1] = 0.15;
-  command.kOm[2] = 0.15;
-  */
-
   ros::Time next_odom_pub_time = ros::Time::now();
   while (n.ok())
   {
     ros::spinOnce();
 
+    auto last = control;
     control = getControl(quad, command);
-    quad.setMotorRPMs(control.rpm);
-    quad.step(dt, disturbance.f, disturbance.m);
+    for (int i = 0; i < 4; ++i)
+    {
+      //! @bug might have nan when the input is legal
+      if (std::isnan(control.rpm[i]))
+        control.rpm[i] = last.rpm[i];
+    }
+    quad.setInput(control.rpm[0], control.rpm[1], control.rpm[2],
+                  control.rpm[3]);
+    quad.setExternalForce(disturbance.f);
+    quad.setExternalMoment(disturbance.m);
+    quad.step(dt);
 
     ros::Time tnow = ros::Time::now();
 
     if (tnow >= next_odom_pub_time)
     {
+      next_odom_pub_time += odom_pub_duration;
+      odom_msg.header.stamp = tnow;
       state = quad.getState();
       stateToOdomMsg(state, odom_msg);
       quadToImuMsg(quad, imu);
-      odom_msg.header.stamp = tnow;
       imu.header.stamp = tnow;
       odom_pub.publish(odom_msg);
       imu_pub.publish(imu);
-      next_odom_pub_time += odom_pub_duration;
     }
+
     r.sleep();
   }
 
