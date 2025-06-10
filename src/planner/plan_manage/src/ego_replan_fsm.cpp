@@ -65,8 +65,9 @@ namespace ego_planner
     planner_manager_->deliverTrajToOptimizer(); // store trajectories
     planner_manager_->setDroneIdtoOpt();
 
-    // Set formation from config if formation_type is 2 (S型)
-    if (formation_type_ == 2)
+    int formation_type;
+    nh.param("optimization/formation_type", formation_type, -1);
+    if (formation_type == 2) // S型队形
     {
       std::vector<std::vector<double>> relative_positions(8, std::vector<double>(3));
       for (int i = 0; i < 8; i++)
