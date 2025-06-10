@@ -100,24 +100,25 @@ namespace ego_planner
     /* check the safety of trajectory */
     double T_end;
     poly_traj::Trajectory traj = jerkOpt_.getTraj();
-    
+
     int N = traj.getPieceNum();
     int k = cps_num_prePiece_ * N + 1;
     int idx = k / 3 * 2;
     int piece_of_idx = floor((idx - 1) / cps_num_prePiece_);
     Eigen::VectorXd durations = traj.getDurations();
-    T_end = durations.head(piece_of_idx).sum() 
-            + durations(piece_of_idx) * (idx - piece_of_idx * cps_num_prePiece_) / cps_num_prePiece_;
+    T_end = durations.head(piece_of_idx).sum() + durations(piece_of_idx) * (idx - piece_of_idx * cps_num_prePiece_) / cps_num_prePiece_;
 
     bool occ = false;
     double dt = 0.01;
-    int i_end = floor(T_end/dt);
+    int i_end = floor(T_end / dt);
     double t = 0.0;
     collision_check_time_end_ = T_end;
 
-    for (int i=0; i<i_end; i++){
+    for (int i = 0; i < i_end; i++)
+    {
       Eigen::Vector3d pos = traj.getPos(t);
-      if(grid_map_->getInflateOccupancy(pos) == 1){
+      if (grid_map_->getInflateOccupancy(pos) == 1)
+      {
         occ = true;
         break;
       }
@@ -153,7 +154,6 @@ namespace ego_planner
     opt->addPVAGradCost2CT(gradT, obs_swarm_feas_qvar_costs, opt->cps_num_prePiece_); // Time int cost
 
     opt->jerkOpt_.getGrad2TP(gradT, gradP);
-
 
     opt->VirtualTGradCost(T, t, gradT, gradt, time_cost);
 
@@ -238,7 +238,7 @@ namespace ego_planner
     costs.setZero();
     double t = 0;
     // Eigen::MatrixXd constrain_pts(3, N * K + 1);
-  
+
     // int innerLoop;
     for (int i = 0; i < N; ++i)
     {
@@ -332,7 +332,6 @@ namespace ego_planner
       t += jerkOpt_.get_T1()(i);
     }
 
-
     // quratic variance
     Eigen::MatrixXd gdp;
     double var;
@@ -370,7 +369,6 @@ namespace ego_planner
       }
     }
     costs(5) += var;
-
   }
 
   bool PolyTrajOptimizer::swarmGraphGradCostP(const int i_dp,
@@ -736,23 +734,31 @@ namespace ego_planner
   /* helper functions */
   void PolyTrajOptimizer::setParam(ros::NodeHandle &nh)
   {
-    nh.param("optimization/constrain_points_perPiece", cps_num_prePiece_, -1);
-    nh.param("optimization/weight_obstacle", wei_obs_, -1.0);
-    nh.param("optimization/weight_swarm", wei_swarm_, -1.0);
-    nh.param("optimization/weight_feasibility", wei_feas_, -1.0);
-    nh.param("optimization/weight_sqrvariance", wei_sqrvar_, -1.0);
-    nh.param("optimization/weight_time", wei_time_, -1.0);
-    nh.param("optimization/weight_formation", wei_formation_, -1.0);
+    nh.param("optimization/weight_obstacle", wei_obs_, 0.0);
+    nh.param("optimization/weight_swarm", wei_swarm_, 0.0);
+    nh.param("optimization/weight_feasibility", wei_feas_, 0.0);
+    nh.param("optimization/weight_sqrvariance", wei_sqrvar_, 0.0);
+    nh.param("optimization/weight_time", wei_time_, 0.0);
+    nh.param("optimization/weight_formation", wei_formation_, 0.0);
 
-    nh.param("optimization/obstacle_clearance", obs_clearance_, -1.0);
-    nh.param("optimization/swarm_clearance", swarm_clearance_, -1.0);
-    nh.param("optimization/formation_type", formation_type_, -1);
-    nh.param("optimization/max_vel", max_vel_, -1.0);
-    nh.param("optimization/max_acc", max_acc_, -1.0);
+    nh.param("optimization/obstacle_clearance", obs_clearance_, 0.0);
+    nh.param("optimization/swarm_clearance", swarm_clearance_, 0.0);
+    nh.param("manager/max_vel", max_vel_, 0.0);
+    nh.param("manager/max_acc", max_acc_, 0.0);
+    nh.param("optimization/formation_type", formation_type_, 0);
+    nh.param("optimization/record_opt", record_opt_, false);
+    nh.param("optimization/constrain_points_perPiece", cps_num_prePiece_, 0);
 
-    // set the formation type
+    // setDesiredFormation(formation_type_);
     swarm_graph_.reset(new SwarmGraph);
-    setDesiredFormation(formation_type_);
+    swarm_graph_->setGraph(formation_size_);
+    // swarm_graph_->debug();
+
+    string str_dir;
+    nh.param("fsm/result_file", str_dir, string(""));
+    result_fn_ = str_dir + "d" + to_string(drone_id_) + "_f" + to_string(formation_type_) + ".csv";
+
+    cout << "result_fn_ = " << result_fn_ << endl;
   }
 
   void PolyTrajOptimizer::setEnvironment(const GridMap::Ptr &map)
@@ -773,6 +779,7 @@ namespace ego_planner
 
   void PolyTrajOptimizer::setDroneId(const int drone_id)
   {
-    drone_id_ = drone_id;}
+    drone_id_ = drone_id;
+  }
 
 }
