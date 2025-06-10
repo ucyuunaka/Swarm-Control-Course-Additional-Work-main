@@ -21,26 +21,25 @@ namespace ego_planner
   {
     // SECTION stable
   public:
-  
     EGOPlannerManager();
     ~EGOPlannerManager();
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    
+
     /* main planning interface */
     bool reboundReplan(
-        const Eigen::Vector3d &start_pt, const Eigen::Vector3d &start_vel, const Eigen::Vector3d &start_acc, 
-        const double trajectory_start_time, const Eigen::Vector3d &end_pt, const Eigen::Vector3d &end_vel, 
+        const Eigen::Vector3d &start_pt, const Eigen::Vector3d &start_vel, const Eigen::Vector3d &start_acc,
+        const double trajectory_start_time, const Eigen::Vector3d &end_pt, const Eigen::Vector3d &end_vel,
         const bool flag_polyInit, const bool flag_randomPolyTraj,
         const bool use_formation, const bool have_local_traj);
     bool computeInitReferenceState(
-        const Eigen::Vector3d &start_pt, const Eigen::Vector3d &start_vel, 
+        const Eigen::Vector3d &start_pt, const Eigen::Vector3d &start_vel,
         const Eigen::Vector3d &start_acc, const Eigen::Vector3d &local_target_pt,
         const Eigen::Vector3d &local_target_vel, const double &ts, poly_traj::MinJerkOpt &initMJO,
         const bool flag_polyInit);
     bool planGlobalTrajWaypoints(
-        const Eigen::Vector3d &start_pos, const Eigen::Vector3d &start_vel, 
-        const Eigen::Vector3d &start_acc, const std::vector<Eigen::Vector3d> &waypoints, 
+        const Eigen::Vector3d &start_pos, const Eigen::Vector3d &start_vel,
+        const Eigen::Vector3d &start_acc, const std::vector<Eigen::Vector3d> &waypoints,
         const Eigen::Vector3d &end_vel, const Eigen::Vector3d &end_acc);
     void getLocalTarget(
         const double planning_horizen,
@@ -52,6 +51,11 @@ namespace ego_planner
     void deliverTrajToOptimizer(void) { ploy_traj_opt_->setSwarmTrajs(&traj_.swarm_traj); };
 
     void setDroneIdtoOpt(void) { ploy_traj_opt_->setDroneId(pp_.drone_id); }
+
+    void setFormationFromConfig(const std::vector<std::vector<double>> &relative_positions)
+    {
+      ploy_traj_opt_->setDesiredFormationFromConfig(relative_positions);
+    }
 
     double getSwarmClearance(void) { return ploy_traj_opt_->getSwarmClearance(); }
 
@@ -65,7 +69,7 @@ namespace ego_planner
     GridMap::Ptr grid_map_;
     // SwarmTrajData swarm_trajs_;
     TrajContainer traj_;
-    
+
     // ros::Publisher obj_pub_; //zx-todo
 
     PolyTrajOptimizer::Ptr ploy_traj_opt_;

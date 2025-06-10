@@ -305,6 +305,27 @@ namespace ego_planner
       }
     }
 
+    void setDesiredFormationFromConfig(const std::vector<std::vector<double>> &relative_positions)
+    {
+      std::vector<Eigen::Vector3d> swarm_des;
+
+      for (size_t i = 0; i < relative_positions.size(); i++)
+      {
+        if (relative_positions[i].size() >= 3)
+        {
+          Eigen::Vector3d v(relative_positions[i][0], relative_positions[i][1], relative_positions[i][2]);
+          swarm_des.push_back(v);
+        }
+      }
+
+      if (swarm_des.size() > 0)
+      {
+        formation_size_ = swarm_des.size();
+        swarm_graph_->setDesiredForm(swarm_des);
+        use_formation_ = true;
+      }
+    }
+
   public:
     typedef unique_ptr<PolyTrajOptimizer> Ptr;
   };

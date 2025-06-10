@@ -65,6 +65,19 @@ namespace ego_planner
     planner_manager_->deliverTrajToOptimizer(); // store trajectories
     planner_manager_->setDroneIdtoOpt();
 
+    // Set formation from config if formation_type is 2 (S型)
+    if (formation_type_ == 2)
+    {
+      std::vector<std::vector<double>> relative_positions(8, std::vector<double>(3));
+      for (int i = 0; i < 8; i++)
+      {
+        relative_positions[i][0] = swarm_relative_pts_[i][0];
+        relative_positions[i][1] = swarm_relative_pts_[i][1];
+        relative_positions[i][2] = swarm_relative_pts_[i][2];
+      }
+      planner_manager_->setFormationFromConfig(relative_positions);
+    }
+
     /* callback */
     exec_timer_ = nh.createTimer(ros::Duration(0.01), &EGOReplanFSM::execFSMCallback, this);
     safety_timer_ = nh.createTimer(ros::Duration(0.05), &EGOReplanFSM::checkCollisionCallback, this);
