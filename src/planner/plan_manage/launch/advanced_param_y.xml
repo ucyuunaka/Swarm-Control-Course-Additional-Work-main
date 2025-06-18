@@ -35,6 +35,7 @@
   <arg name="use_distinctive_trajs"/>
   <arg name="obj_num_set"/>
   <arg name="drone_id"/>
+  <arg name="formation_type"/>
   
   <!-- main node -->
   <node pkg="ego_planner" name="drone_$(arg drone_id)_ego_planner_node" type="ego_planner_node" output="screen">
@@ -138,6 +139,7 @@
     
     <param name="optimization/max_vel"                      value="$(arg max_vel)" type="double"/>
     <param name="optimization/max_acc"                      value="$(arg max_acc)" type="double"/>
+    <param name="optimization/formation_type"               value="$(arg formation_type)" type="int"/>
     
     <param name="optimization/record_opt" value="true"/>
   </node>

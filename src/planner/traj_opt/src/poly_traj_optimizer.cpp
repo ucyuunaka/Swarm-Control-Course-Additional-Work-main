@@ -751,6 +751,8 @@ namespace ego_planner
 
     swarm_graph_.reset(new SwarmGraph);
 
+    setDesiredFormation(formation_type_);
+
     string str_dir;
     nh.param("fsm/result_file", str_dir, string(""));
     result_fn_ = str_dir + "d" + to_string(drone_id_) + "_f" + to_string(formation_type_) + ".csv";

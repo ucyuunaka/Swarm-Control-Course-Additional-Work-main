@@ -42,6 +42,7 @@
         <arg name="map_size_x_"             value="$(arg map_size_x)"/>
         <arg name="map_size_y_"             value="$(arg map_size_y)"/>
         <arg name="map_size_z_"             value="$(arg map_size_z)"/>
+        <arg name="formation_type"          value="$(arg formation_type)"/>
 
         <!-- camera pose: transform of camera frame in the world frame -->
         <!-- depth topic: depth image, 640x480 by default -->

@@ -55,6 +55,7 @@
         <arg name="map_size_y"              value="$(arg map_size_y)"/>
         <arg name="map_size_z"              value="$(arg map_size_z)"/>
         <arg name="odom_topic"              value="$(arg odom_topic)"/>
+        <arg name="formation_type"          value="$(arg formation_type)"/>
         
     </include>
 
@@ -74,6 +75,7 @@
         <arg name="map_size_y"              value="$(arg map_size_y)"/>
         <arg name="map_size_z"              value="$(arg map_size_z)"/>
         <arg name="odom_topic"              value="$(arg odom_topic)"/>
+        <arg name="formation_type"          value="$(arg formation_type)"/>
 
     </include>
 
@@ -92,6 +94,7 @@
         <arg name="map_size_y"              value="$(arg map_size_y)"/>
         <arg name="map_size_z"              value="$(arg map_size_z)"/>
         <arg name="odom_topic"              value="$(arg odom_topic)"/>
+        <arg name="formation_type"          value="$(arg formation_type)"/>
 
     </include>
 
@@ -110,6 +113,7 @@
         <arg name="map_size_y"              value="$(arg map_size_y)"/>
         <arg name="map_size_z"              value="$(arg map_size_z)"/>
         <arg name="odom_topic"              value="$(arg odom_topic)"/>
+        <arg name="formation_type"          value="$(arg formation_type)"/>
 
     </include>
     
@@ -128,6 +132,7 @@
         <arg name="map_size_y"              value="$(arg map_size_y)"/>
         <arg name="map_size_z"              value="$(arg map_size_z)"/>
         <arg name="odom_topic"              value="$(arg odom_topic)"/>
+        <arg name="formation_type"          value="$(arg formation_type)"/>
 
     </include>
 
@@ -146,6 +151,7 @@
         <arg name="map_size_y"              value="$(arg map_size_y)"/>
         <arg name="map_size_z"              value="$(arg map_size_z)"/>
         <arg name="odom_topic"              value="$(arg odom_topic)"/>
+        <arg name="formation_type"          value="$(arg formation_type)"/>
 
     </include>
 
@@ -164,6 +170,7 @@
         <arg name="map_size_y"              value="$(arg map_size_z)"/>
         <arg name="map_size_z"              value="$(arg map_size_z)"/>
         <arg name="odom_topic"              value="$(arg odom_topic)"/>
+        <arg name="formation_type"          value="$(arg formation_type)"/>
     </include>
 
     <include file="$(find ego_planner)/launch/run_in_sim_y.launch">
@@ -181,6 +188,7 @@
         <arg name="map_size_y"              value="$(arg map_size_y)"/>
         <arg name="map_size_z"              value="$(arg map_size_z)"/>
         <arg name="odom_topic"              value="$(arg odom_topic)"/>
+        <arg name="formation_type"          value="$(arg formation_type)"/>
     </include>
 
   </launch> 
