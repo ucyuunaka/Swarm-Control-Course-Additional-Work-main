@@ -1,0 +1,33 @@
+# 自动队形切换配置文件
+# global goal setting
+global_goal:
+  swarm_central_pos: {x: 25.0, y: 0.0, z: 1.0}
+  swarm_scale : 2.0
+  # 初始S型队形配置
+  relative_pos_0 : {x: -1.5, y: -1.0, z: 0.0}
+  relative_pos_1 : {x: -0.5, y: -2.0, z: 0.0}
+  relative_pos_2 : {x: 0.5, y: -2.0, z: 0.0}
+  relative_pos_3 : {x: 1.5, y: -1.0, z: 0.0} 
+  relative_pos_4 : {x: -1.5, y: 1.0, z: 0.0}
+  relative_pos_5 : {x: -0.5, y: 2.0, z: 0.0}
+  relative_pos_6 : {x: 0.5, y: 2.0, z: 0.0} 
+  relative_pos_7 : {x: 1.5, y: 1.0, z: 0.0} 
+
+# 自动队形切换设置
+formation_switch:
+  enable: true                # 启用自动队形切换
+  interval: 20.0              # 切换间隔（秒）
+
+optimization:
+  formation_type      : 2     # 初始队形类型（S型）
+  weight_obstacle     : 50000.0
+  weight_swarm        : 50000.0
+  weight_feasibility  : 10000.0
+  weight_sqrvariance  : 10000.0
+  weight_time         : 80.0
+  weight_formation    : 15000.0
+  obstacle_clearance  : 0.5
+  swarm_clearance     : 0.5
+
+fsm:
+  replan_trajectory_time : 0.1    # s, the max time of replanning trajectory 

@@ -626,5 +626,15 @@ namespace ego_planner
     }
   }
 
-  // PlanningVisualization::
+  void PlanningVisualization::updateFormationType(int formation_type)
+  {
+    // 更新内部队形类型
+    formation_type_ = formation_type;
+
+    // 重新初始化连线配置
+    initSwarmGraphVisual();
+
+    ROS_INFO("[DEBUG] 队形可视化已更新为类型: %d", formation_type);
+  }
+
 } // namespace ego_planner

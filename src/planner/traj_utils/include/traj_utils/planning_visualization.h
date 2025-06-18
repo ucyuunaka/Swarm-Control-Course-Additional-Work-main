@@ -118,7 +118,9 @@ namespace ego_planner
 
     void displayIntermediatePt(std::string type, Eigen::MatrixXd &pts, int id, Eigen::Vector4d color);
     void displayIntermediateGrad(std::string type, Eigen::MatrixXd &pts, Eigen::MatrixXd &grad, int id, Eigen::Vector4d color);
-    // void displayNewArrow(ros::Publisher& guide_vector_pub, ego_planner::PolyTrajOptimizer::Ptr optimizer);
+
+    // 动态更新队形可视化函数
+    void updateFormationType(int formation_type);
   };
 } // namespace ego_planner
 #endif

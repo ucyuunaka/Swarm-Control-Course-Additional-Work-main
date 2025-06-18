@@ -41,15 +41,16 @@ namespace ego_planner
       REPLAN_TRAJ,
       EXEC_TRAJ,
       EMERGENCY_STOP,
-      SEQUENTIAL_START
+      SEQUENTIAL_START,
+      AUTO_FORMATION_SWITCH
     };
     enum TARGET_TYPE
     {
       MANUAL_TARGET = 1,
-      PRESET_TARGET ,
-      SWARM_MANUAL_TARGET 
+      PRESET_TARGET,
+      SWARM_MANUAL_TARGET
     };
-    
+
     /* planning utils */
     EGOPlannerManager::Ptr planner_manager_;
     PlanningVisualization::Ptr visualization_;
@@ -69,7 +70,7 @@ namespace ego_planner
     int last_end_id_;
     double replan_trajectory_time_;
 
-     // global goal setting for swarm
+    // global goal setting for swarm
     Eigen::Vector3d swarm_central_pos_;
     double swarm_relative_pts_[50][3];
     double swarm_scale_;
@@ -78,6 +79,16 @@ namespace ego_planner
     bool have_trigger_, have_target_, have_odom_, have_new_target_, have_recv_pre_agent_, have_local_traj_;
     FSM_EXEC_STATE exec_state_;
     int continously_called_times_{0};
+
+    // 自动队形切换相关变量
+    bool enable_auto_formation_switch_;    // 是否启用自动队形切换
+    int current_formation_type_;           // 当前队形类型
+    int next_formation_index_;             // 下一个队形索引
+    ros::Time last_formation_switch_time_; // 上次队形切换时间
+    double formation_switch_interval_;     // 队形切换间隔时间（秒）
+    std::vector<int> formation_sequence_;  // 队形切换序列：S(2)->Y(3)->S(2)->U(4)
+    ros::Timer formation_switch_timer_;    // 队形切换定时器
+    bool formation_switch_in_progress_;    // 队形切换进行中标志
 
     Eigen::Vector3d odom_pos_, odom_vel_, odom_acc_; // odometry state
     Eigen::Quaterniond odom_orient_;
@@ -106,10 +117,10 @@ namespace ego_planner
     fstream result_file_;
     /* helper functions */
     bool callReboundReplan(bool flag_use_poly_init, bool flag_randomPolyTraj, bool use_formation); // front-end and back-end method
-    bool callEmergencyStop(Eigen::Vector3d stop_pos);                          // front-end and back-end method
+    bool callEmergencyStop(Eigen::Vector3d stop_pos);                                              // front-end and back-end method
     bool planFromGlobalTraj(const int trial_times = 1);
     bool planFromLocalTraj(bool flag_use_poly_init, bool use_formation);
-    
+
     /* return value: std::pair< Times of the same state be continuously called, current continuously called state > */
     void changeFSMExecState(FSM_EXEC_STATE new_state, string pos_call);
     std::pair<int, EGOReplanFSM::FSM_EXEC_STATE> timesOfConsecutiveStateCalls();
@@ -130,12 +141,17 @@ namespace ego_planner
     bool frontEndPathSearching();
     bool checkCollision();
 
+    // 自动队形切换相关函数
+    void formationSwitchTimerCallback(const ros::TimerEvent &e);
+    void switchToNextFormation();
+    void updateFormationAndVisualization(int formation_type);
+    void setTargetToCurrentPosition(); // 设置目标点
+
   public:
     EGOReplanFSM(/* args */)
     {
     }
     ~EGOReplanFSM();
-
 
     void init(ros::NodeHandle &nh);
 

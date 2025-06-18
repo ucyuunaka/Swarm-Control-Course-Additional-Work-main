@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+  <arg name="formation_type" default="2"/>
+  
+  <rosparam file="$(find ego_planner)/config/auto_formation_switch.yaml" command="load"/>
+  
+  <param name="optimization/formation_type" value="$(arg formation_type)" type="int"/>
+
+  <param name="manager/max_vel" value="2.0" type="double"/>
+  <param name="manager/max_acc" value="3.0" type="double"/>
+  <param name="manager/polyTraj_piece_length" value="1.5" type="double"/>
+  <param name="manager/feasibility_tolerance" value="0.05" type="double"/>
+  <param name="manager/planning_horizon" value="10.0" type="double"/>
+  <param name="manager/use_distinctive_trajs" value="false" type="bool"/>
+
+  <param name="grid_map/resolution" value="0.1" /> 
+  <param name="grid_map/map_size_x" value="80.0" /> 
+  <param name="grid_map/map_size_y" value="60.0" /> 
+  <param name="grid_map/map_size_z" value="5.0" /> 
+  <param name="grid_map/local_update_range_x" value="5.5" /> 
+  <param name="grid_map/local_update_range_y" value="5.5" /> 
+  <param name="grid_map/local_update_range_z" value="4.5" /> 
+  <param name="grid_map/obstacles_inflation" value="0.099" /> 
+  <param name="grid_map/local_map_margin" value="10"/>
+  <param name="grid_map/ground_height" value="0.01"/>
+
+  <param name="astar/resolution_astar" value="0.1" type="double"/>
+  <param name="astar/time_resolution" value="0.8" type="double"/>
+  <param name="astar/lambda_heu" value="10.0" type="double"/>
+  <param name="astar/margin" value="0.2" type="double"/>
+  <param name="astar/allocate_num" value="100000" type="int"/>
+  <param name="astar/check_num" value="10" type="int"/>
+
+  <param name="optimization/constrain_points_perPiece" value="5" type="int"/>
+  <param name="optimization/weight_obstacle" value="50000.0" type="double"/>
+  <param name="optimization/weight_swarm" value="50000.0" type="double"/>
+  <param name="optimization/weight_feasibility" value="10000.0" type="double"/>
+  <param name="optimization/weight_sqrvariance" value="10000.0" type="double"/>
+  <param name="optimization/weight_time" value="80.0" type="double"/>
+  <param name="optimization/weight_formation" value="15000.0" type="double"/>
+  <param name="optimization/obstacle_clearance" value="0.5" type="double"/>
+  <param name="optimization/swarm_clearance" value="0.5" type="double"/>
+  <param name="optimization/record_opt" value="false" type="bool"/>
+
+  <param name="fsm/flight_type" value="3" type="int"/> <!-- SWARM_MANUAL_TARGET -->
+  <param name="fsm/thresh_replan_time" value="1.0" type="double"/>
+  <param name="fsm/thresh_no_replan_meter" value="1.0" type="double"/>
+  <param name="fsm/planning_horizon" value="10.0" type="double"/>
+  <param name="fsm/planning_horizen_time" value="3" type="double"/>
+  <param name="fsm/emergency_time" value="1.0" type="double"/>
+  <param name="fsm/realworld_experiment" value="false"/>
+  <param name="fsm/fail_safe" value="true"/>
+  <param name="fsm/replan_trajectory_time" value="0.1" type="double"/>
+
+</launch> 

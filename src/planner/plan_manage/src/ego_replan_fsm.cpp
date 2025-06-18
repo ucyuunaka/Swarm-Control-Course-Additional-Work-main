@@ -77,6 +77,29 @@ namespace ego_planner
       planner_manager_->setFormationFromConfig(relative_positions);
     }
 
+    // 自动队形切换功能初始化
+    nh.param("formation_switch/enable", enable_auto_formation_switch_, false);
+    nh.param("formation_switch/interval", formation_switch_interval_, 20.0); // 默认20秒间隔
+
+    if (enable_auto_formation_switch_)
+    {
+      // 设置队形切换序列：S(2)->Y(3)->S(2)->U(4)
+      formation_sequence_ = {2, 3, 2, 4}; // S -> Y -> S -> U
+      current_formation_type_ = 2;        // 初始为S型
+      next_formation_index_ = 1;          // 下一个是Y型（索引1）
+      formation_switch_in_progress_ = false;
+      last_formation_switch_time_ = ros::Time::now();
+
+      // 创建队形切换定时器
+      formation_switch_timer_ = nh.createTimer(
+          ros::Duration(formation_switch_interval_),
+          &EGOReplanFSM::formationSwitchTimerCallback,
+          this);
+
+      ROS_INFO("[DEBUG] 自动队形切换功能已启用，切换间隔: %.1f秒", formation_switch_interval_);
+      ROS_INFO("[DEBUG] 队形切换序列: S->Y->S->U");
+    }
+
     /* callback */
     exec_timer_ = nh.createTimer(ros::Duration(0.01), &EGOReplanFSM::execFSMCallback, this);
     safety_timer_ = nh.createTimer(ros::Duration(0.05), &EGOReplanFSM::checkCollisionCallback, this);
@@ -255,7 +278,14 @@ namespace ego_planner
           have_local_traj_ = false;
 
           /* The navigation task completed */
-          changeFSMExecState(WAIT_TARGET, "FSM");
+          if (enable_auto_formation_switch_)
+          {
+            changeFSMExecState(AUTO_FORMATION_SWITCH, "FSM");
+          }
+          else
+          {
+            changeFSMExecState(WAIT_TARGET, "FSM");
+          }
 
           result_file_ << planner_manager_->pp_.drone_id << "\t" << (ros::Time::now() - planner_manager_->global_start_time_).toSec() << "\t" << planner_manager_->average_plan_time_ << "\n";
 
@@ -276,6 +306,24 @@ namespace ego_planner
         changeFSMExecState(REPLAN_TRAJ, "FSM");
       }
 
+      break;
+    }
+
+    case AUTO_FORMATION_SWITCH:
+    {
+      // 等待队形切换触发或继续等待
+      if (!formation_switch_in_progress_)
+      {
+        // 没有队形切换正在进行，继续等待
+        goto force_return;
+      }
+      else
+      {
+        // 队形切换已触发，设置目标为当前位置并开始规划
+        setTargetToCurrentPosition();
+        changeFSMExecState(SEQUENTIAL_START, "FORMATION_SWITCH");
+        formation_switch_in_progress_ = false;
+      }
       break;
     }
 
@@ -893,6 +941,186 @@ namespace ego_planner
     poly_traj_pub_.publish(msg);
 
     return true;
+  }
+
+  // 自动队形切换相关函数实现
+  void EGOReplanFSM::formationSwitchTimerCallback(const ros::TimerEvent &e)
+  {
+    if (!enable_auto_formation_switch_)
+    {
+      return;
+    }
+
+    // 检查是否到了切换时间
+    ros::Time current_time = ros::Time::now();
+    if ((current_time - last_formation_switch_time_).toSec() >= formation_switch_interval_)
+    {
+      if (exec_state_ == AUTO_FORMATION_SWITCH && !formation_switch_in_progress_)
+      {
+        ROS_INFO("[DEBUG] 触发队形切换，从 %d 切换到 %d",
+                 current_formation_type_, formation_sequence_[next_formation_index_]);
+
+        switchToNextFormation();
+        formation_switch_in_progress_ = true;
+        last_formation_switch_time_ = current_time;
+      }
+    }
+  }
+
+  void EGOReplanFSM::switchToNextFormation()
+  {
+    // 获取下一个队形类型
+    int new_formation_type = formation_sequence_[next_formation_index_];
+
+    ROS_INFO("[DEBUG] 切换到队形类型: %d", new_formation_type);
+
+    // 更新队形和可视化
+    updateFormationAndVisualization(new_formation_type);
+
+    // 更新当前队形类型
+    current_formation_type_ = new_formation_type;
+
+    // 更新下一个队形索引（循环）
+    next_formation_index_ = (next_formation_index_ + 1) % formation_sequence_.size();
+  }
+
+  void EGOReplanFSM::updateFormationAndVisualization(int formation_type)
+  {
+    // 更新优化器中的队形类型
+    planner_manager_->ploy_traj_opt_->setDesiredFormation(formation_type);
+
+    // 更新可视化连线
+    visualization_->updateFormationType(formation_type);
+
+    // 根据新队形类型更新相对位置配置
+    if (formation_type == 2)
+    { // S型
+      // 使用S型的坐标配置
+      swarm_relative_pts_[0][0] = -1.5;
+      swarm_relative_pts_[0][1] = -1.0;
+      swarm_relative_pts_[0][2] = 0.0;
+      swarm_relative_pts_[1][0] = -0.5;
+      swarm_relative_pts_[1][1] = -2.0;
+      swarm_relative_pts_[1][2] = 0.0;
+      swarm_relative_pts_[2][0] = 0.5;
+      swarm_relative_pts_[2][1] = -2.0;
+      swarm_relative_pts_[2][2] = 0.0;
+      swarm_relative_pts_[3][0] = 1.5;
+      swarm_relative_pts_[3][1] = -1.0;
+      swarm_relative_pts_[3][2] = 0.0;
+      swarm_relative_pts_[4][0] = -1.5;
+      swarm_relative_pts_[4][1] = 1.0;
+      swarm_relative_pts_[4][2] = 0.0;
+      swarm_relative_pts_[5][0] = -0.5;
+      swarm_relative_pts_[5][1] = 2.0;
+      swarm_relative_pts_[5][2] = 0.0;
+      swarm_relative_pts_[6][0] = 0.5;
+      swarm_relative_pts_[6][1] = 2.0;
+      swarm_relative_pts_[6][2] = 0.0;
+      swarm_relative_pts_[7][0] = 1.5;
+      swarm_relative_pts_[7][1] = 1.0;
+      swarm_relative_pts_[7][2] = 0.0;
+    }
+    else if (formation_type == 3)
+    { // Y型
+      swarm_relative_pts_[0][0] = -1.5;
+      swarm_relative_pts_[0][1] = -2.0;
+      swarm_relative_pts_[0][2] = 0.0;
+      swarm_relative_pts_[1][0] = -0.75;
+      swarm_relative_pts_[1][1] = -1.25;
+      swarm_relative_pts_[1][2] = 0.0;
+      swarm_relative_pts_[2][0] = 1.5;
+      swarm_relative_pts_[2][1] = -2.0;
+      swarm_relative_pts_[2][2] = 0.0;
+      swarm_relative_pts_[3][0] = 0.75;
+      swarm_relative_pts_[3][1] = -1.25;
+      swarm_relative_pts_[3][2] = 0.0;
+      swarm_relative_pts_[4][0] = 0.0;
+      swarm_relative_pts_[4][1] = -0.5;
+      swarm_relative_pts_[4][2] = 0.0;
+      swarm_relative_pts_[5][0] = 0.0;
+      swarm_relative_pts_[5][1] = 0.5;
+      swarm_relative_pts_[5][2] = 0.0;
+      swarm_relative_pts_[6][0] = 0.0;
+      swarm_relative_pts_[6][1] = 1.25;
+      swarm_relative_pts_[6][2] = 0.0;
+      swarm_relative_pts_[7][0] = 0.0;
+      swarm_relative_pts_[7][1] = 2.0;
+      swarm_relative_pts_[7][2] = 0.0;
+    }
+    else if (formation_type == 4)
+    { // U型
+      swarm_relative_pts_[0][0] = -1.5;
+      swarm_relative_pts_[0][1] = -2.0;
+      swarm_relative_pts_[0][2] = 0.0;
+      swarm_relative_pts_[1][0] = -1.5;
+      swarm_relative_pts_[1][1] = -0.5;
+      swarm_relative_pts_[1][2] = 0.0;
+      swarm_relative_pts_[2][0] = -1.2;
+      swarm_relative_pts_[2][1] = 1.0;
+      swarm_relative_pts_[2][2] = 0.0;
+      swarm_relative_pts_[3][0] = -0.6;
+      swarm_relative_pts_[3][1] = 2.0;
+      swarm_relative_pts_[3][2] = 0.0;
+      swarm_relative_pts_[4][0] = 0.6;
+      swarm_relative_pts_[4][1] = 2.0;
+      swarm_relative_pts_[4][2] = 0.0;
+      swarm_relative_pts_[5][0] = 1.2;
+      swarm_relative_pts_[5][1] = 1.0;
+      swarm_relative_pts_[5][2] = 0.0;
+      swarm_relative_pts_[6][0] = 1.5;
+      swarm_relative_pts_[6][1] = -0.5;
+      swarm_relative_pts_[6][2] = 0.0;
+      swarm_relative_pts_[7][0] = 1.5;
+      swarm_relative_pts_[7][1] = -2.0;
+      swarm_relative_pts_[7][2] = 0.0;
+    }
+
+    // 将新的相对位置配置传递给优化器
+    std::vector<std::vector<double>> relative_positions(8, std::vector<double>(3));
+    for (int i = 0; i < 8; i++)
+    {
+      relative_positions[i][0] = swarm_relative_pts_[i][0];
+      relative_positions[i][1] = swarm_relative_pts_[i][1];
+      relative_positions[i][2] = swarm_relative_pts_[i][2];
+    }
+    planner_manager_->setFormationFromConfig(relative_positions);
+
+    ROS_INFO("[DEBUG] 队形 %d 配置已更新", formation_type);
+  }
+
+  void EGOReplanFSM::setTargetToCurrentPosition()
+  {
+    // 设置目标点为当前位置，实现原地队形切换
+    init_pt_ = odom_pos_;
+
+    // 计算当前位置的群体中心点
+    int id = planner_manager_->pp_.drone_id;
+    if (id >= 8)
+    {
+      ROS_ERROR("Drone ID %d is out of bounds for relative points vector size %d", id, 8);
+      return;
+    }
+
+    Eigen::Vector3d relative_pos;
+    relative_pos << swarm_relative_pts_[id][0],
+        swarm_relative_pts_[id][1],
+        swarm_relative_pts_[id][2];
+
+    // 基于当前位置反推群体中心点（原地变换）
+    swarm_central_pos_ = odom_pos_ - swarm_scale_ * relative_pos;
+
+    // 计算新的目标位置
+    end_pt_ = swarm_central_pos_ + swarm_scale_ * relative_pos;
+
+    ROS_INFO("[DEBUG] Drone %d 设置原地切换目标: 中心位置(%.2f, %.2f, %.2f), 目标位置(%.2f, %.2f, %.2f)",
+             id, swarm_central_pos_(0), swarm_central_pos_(1), swarm_central_pos_(2),
+             end_pt_(0), end_pt_(1), end_pt_(2));
+
+    // 设置目标速度为零
+    end_vel_.setZero();
+    have_target_ = true;
+    have_new_target_ = true;
   }
 
 } // namespace ego_planner
