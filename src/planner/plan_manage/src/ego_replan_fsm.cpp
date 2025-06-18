@@ -543,13 +543,18 @@ namespace ego_planner
     {
       if ((int)planner_manager_->traj_.swarm_traj.size() >= planner_manager_->pp_.drone_id)
       {
+        bool all_received = true;
         for (int i = 0; i < planner_manager_->pp_.drone_id; ++i)
         {
           if (planner_manager_->traj_.swarm_traj[i].drone_id != i)
           {
+            all_received = false;
             break;
           }
+        }
 
+        if (all_received)
+        {
           have_recv_pre_agent_ = true;
         }
       }
