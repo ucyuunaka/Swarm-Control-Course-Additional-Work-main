@@ -65,7 +65,7 @@ namespace ego_planner
 
     int formation_type;
     nh.param("optimization/formation_type", formation_type, -1);
-    if (formation_type == 2) // S型队形
+    if (formation_type == 2 || formation_type == 3 || formation_type == 4) // S型、Y型、U型编队
     {
       std::vector<std::vector<double>> relative_positions(8, std::vector<double>(3));
       for (int i = 0; i < 8; i++)
