@@ -169,16 +169,16 @@ namespace ego_planner
 
   void PlanningVisualization::drone_7_odomeCallback(const nav_msgs::OdometryConstPtr &msg)
   {
-    ROS_INFO_THROTTLE(2.0, "[DEBUG] Drone 7 odom callback: formation_type_=%d, formation_size_=%d", formation_type_, formation_size_);
+    // ROS_INFO_THROTTLE(2.0, "[DEBUG] Drone 7 odom callback: formation_type_=%d, formation_size_=%d", formation_type_, formation_size_);
 
     if (formation_size_ <= 7)
     {
-      ROS_WARN_THROTTLE(2.0, "[DEBUG] Drone 7 odom callback RETURNING due to formation_size_=%d", formation_size_);
+      // ROS_WARN_THROTTLE(2.0, "[DEBUG] Drone 7 odom callback RETURNING due to formation_size_=%d", formation_size_);
       return;
     }
 
     swarm_odom[7] << msg->pose.pose.position.x, msg->pose.pose.position.y, msg->pose.pose.position.z;
-    ROS_INFO_THROTTLE(2.0, "[DEBUG] Drone 7 odom updated: (%f, %f, %f)", msg->pose.pose.position.x, msg->pose.pose.position.y, msg->pose.pose.position.z);
+    // ROS_INFO_THROTTLE(2.0, "[DEBUG] Drone 7 odom updated: (%f, %f, %f)", msg->pose.pose.position.x, msg->pose.pose.position.y, msg->pose.pose.position.z);
   }
 
   void PlanningVisualization::drone_8_odomeCallback(const nav_msgs::OdometryConstPtr &msg)
