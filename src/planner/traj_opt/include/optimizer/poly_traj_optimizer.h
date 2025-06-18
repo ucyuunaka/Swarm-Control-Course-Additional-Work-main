@@ -228,14 +228,14 @@ namespace ego_planner
 
       case FORMATION_TYPE::LETTER_S:
       {
-        Eigen::Vector3d v0(1.5, 1, 0);
-        Eigen::Vector3d v1(0.5, 2, 0);
-        Eigen::Vector3d v2(-0.5, 2, 0);
-        Eigen::Vector3d v3(-1.5, 1, 0);
-        Eigen::Vector3d v4(1.5, -1, 0);
-        Eigen::Vector3d v5(0.5, -2, 0);
-        Eigen::Vector3d v6(-0.5, -2, 0);
-        Eigen::Vector3d v7(-1.5, -1, 0);
+        Eigen::Vector3d v0(-1.5, -1, 0);
+        Eigen::Vector3d v1(-0.5, -2, 0);
+        Eigen::Vector3d v2(0.5, -2, 0);
+        Eigen::Vector3d v3(1.5, -1, 0);
+        Eigen::Vector3d v4(-1.5, 1, 0);
+        Eigen::Vector3d v5(-0.5, 2, 0);
+        Eigen::Vector3d v6(0.5, 2, 0);
+        Eigen::Vector3d v7(1.5, 1, 0);
 
         swarm_des.push_back(v0);
         swarm_des.push_back(v1);
@@ -253,14 +253,14 @@ namespace ego_planner
 
       case FORMATION_TYPE::LETTER_Y:
       {
-        Eigen::Vector3d v0(-1.5, 2.0, 0.0);
-        Eigen::Vector3d v1(-0.75, 1.25, 0.0);
-        Eigen::Vector3d v2(1.5, 2.0, 0.0);
-        Eigen::Vector3d v3(0.75, 1.25, 0.0);
-        Eigen::Vector3d v4(0.0, 0.5, 0.0);
-        Eigen::Vector3d v5(0.0, -0.5, 0.0);
-        Eigen::Vector3d v6(0.0, -1.25, 0.0);
-        Eigen::Vector3d v7(0.0, -2.0, 0.0);
+        Eigen::Vector3d v0(-1.5, -2.0, 0.0);
+        Eigen::Vector3d v1(-0.75, -1.25, 0.0);
+        Eigen::Vector3d v2(1.5, -2.0, 0.0);
+        Eigen::Vector3d v3(0.75, -1.25, 0.0);
+        Eigen::Vector3d v4(0.0, -0.5, 0.0);
+        Eigen::Vector3d v5(0.0, 0.5, 0.0);
+        Eigen::Vector3d v6(0.0, 1.25, 0.0);
+        Eigen::Vector3d v7(0.0, 2.0, 0.0);
 
         swarm_des.push_back(v0);
         swarm_des.push_back(v1);
@@ -278,14 +278,14 @@ namespace ego_planner
 
       case FORMATION_TYPE::LETTER_U:
       {
-        Eigen::Vector3d v0(-1.5, 2.0, 0.0);
-        Eigen::Vector3d v1(-1.5, 0.5, 0.0);
-        Eigen::Vector3d v2(-1.2, -1.0, 0.0);
-        Eigen::Vector3d v3(-0.6, -2.0, 0.0);
-        Eigen::Vector3d v4(0.6, -2.0, 0.0);
-        Eigen::Vector3d v5(1.2, -1.0, 0.0);
-        Eigen::Vector3d v6(1.5, 0.5, 0.0);
-        Eigen::Vector3d v7(1.5, 2.0, 0.0);
+        Eigen::Vector3d v0(-1.5, -2.0, 0.0);
+        Eigen::Vector3d v1(-1.5, -0.5, 0.0);
+        Eigen::Vector3d v2(-1.2, 1.0, 0.0);
+        Eigen::Vector3d v3(-0.6, 2.0, 0.0);
+        Eigen::Vector3d v4(0.6, 2.0, 0.0);
+        Eigen::Vector3d v5(1.2, 1.0, 0.0);
+        Eigen::Vector3d v6(1.5, -0.5, 0.0);
+        Eigen::Vector3d v7(1.5, -2.0, 0.0);
 
         swarm_des.push_back(v0);
         swarm_des.push_back(v1);
