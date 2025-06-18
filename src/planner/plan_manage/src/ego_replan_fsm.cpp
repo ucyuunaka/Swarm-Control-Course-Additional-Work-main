@@ -172,6 +172,12 @@ namespace ego_planner
 
     case SEQUENTIAL_START: // for swarm or single drone with drone_id = 0
     {
+      if (planner_manager_->pp_.drone_id == 7)
+      {
+        ROS_INFO_THROTTLE(1.0, "[DEBUG] Drone 7 in SEQUENTIAL_START: have_recv_pre_agent_=%s, swarm_traj_size=%zu",
+                          have_recv_pre_agent_ ? "true" : "false", planner_manager_->traj_.swarm_traj.size());
+      }
+
       if (planner_manager_->pp_.drone_id <= 0 || (planner_manager_->pp_.drone_id >= 1 && have_recv_pre_agent_))
       {
         bool success = planFromGlobalTraj(1);
@@ -185,6 +191,10 @@ namespace ego_planner
           ROS_ERROR("Failed to generate the first trajectory!!!");
           changeFSMExecState(SEQUENTIAL_START, "FSM");
         }
+      }
+      else if (planner_manager_->pp_.drone_id == 7)
+      {
+        ROS_WARN_THROTTLE(1.0, "[DEBUG] Drone 7 waiting for previous agents...");
       }
 
       break;
@@ -541,6 +551,12 @@ namespace ego_planner
     /* Check if receive agents have lower drone id */
     if (!have_recv_pre_agent_)
     {
+      if (planner_manager_->pp_.drone_id == 7)
+      {
+        ROS_INFO_THROTTLE(1.0, "[DEBUG] Drone 7 checking pre-agents: swarm_traj_size=%zu, need_size=%d",
+                          planner_manager_->traj_.swarm_traj.size(), planner_manager_->pp_.drone_id);
+      }
+
       if ((int)planner_manager_->traj_.swarm_traj.size() >= planner_manager_->pp_.drone_id)
       {
         bool all_received = true;
@@ -549,6 +565,11 @@ namespace ego_planner
           if (planner_manager_->traj_.swarm_traj[i].drone_id != i)
           {
             all_received = false;
+            if (planner_manager_->pp_.drone_id == 7)
+            {
+              ROS_WARN_THROTTLE(1.0, "[DEBUG] Drone 7: Missing trajectory from drone %d (got id=%d)",
+                                i, planner_manager_->traj_.swarm_traj[i].drone_id);
+            }
             break;
           }
         }
@@ -556,6 +577,10 @@ namespace ego_planner
         if (all_received)
         {
           have_recv_pre_agent_ = true;
+          if (planner_manager_->pp_.drone_id == 7)
+          {
+            ROS_INFO("[DEBUG] Drone 7: All pre-agents received! Setting have_recv_pre_agent_ = true");
+          }
         }
       }
     }
