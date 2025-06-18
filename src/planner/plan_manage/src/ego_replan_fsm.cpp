@@ -1101,6 +1101,9 @@ namespace ego_planner
     ROS_INFO("[FSM] Drone %d set target for in-place switch: center(%.2f, %.2f, %.2f), target(%.2f, %.2f, %.2f)",
              id, swarm_central_pos_(0), swarm_central_pos_(1), swarm_central_pos_(2),
              end_pt_(0), end_pt_(1), end_pt_(2));
+    ROS_INFO("[FSM] Drone %d current pos: [%.2f, %.2f, %.2f], relative_pos: [%.2f, %.2f, %.2f], scale: %.2f",
+             id, odom_pos_.x(), odom_pos_.y(), odom_pos_.z(),
+             relative_pos.x(), relative_pos.y(), relative_pos.z(), swarm_scale_);
 
     // 设置目标速度为零
     end_vel_.setZero();

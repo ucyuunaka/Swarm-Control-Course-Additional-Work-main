@@ -364,4 +364,38 @@ namespace ego_planner
     return true;
   }
 
+  bool EGOPlannerManager::planGlobalTrajForSwarm(const Eigen::Vector3d &start_pos, const Eigen::Vector3d &start_vel,
+                                                 const Eigen::Vector3d &start_acc, const Eigen::Vector3d &end_pos,
+                                                 const Eigen::Vector3d &end_vel, const Eigen::Vector3d &end_acc,
+                                                 const int uav_id)
+  {
+    if (uav_id != pp_.drone_id)
+    {
+      ROS_ERROR("wrong uav_id, this drone is %d, but a plan for %d is sent.", pp_.drone_id, uav_id);
+      return false;
+    }
+
+    ROS_INFO("[PlannerManager] Drone %d trajectory optimization input: Start=[%.2f,%.2f,%.2f], End=[%.2f,%.2f,%.2f]",
+             uav_id, start_pos.x(), start_pos.y(), start_pos.z(), end_pos.x(), end_pos.y(), end_pos.z());
+
+    bool success = ploy_traj_opt_->optimizeTrajectory(start_pos, start_vel, start_acc,
+                                                      end_pos, end_vel, end_acc);
+
+    if (!success)
+    {
+      ROS_ERROR("[PlannerManager] Trajectory optimization FAILED for drone %d!", uav_id);
+    }
+    else
+    {
+      ROS_INFO("[PlannerManager] Trajectory optimization SUCCEEDED for drone %d.", uav_id);
+    }
+
+    return success;
+  }
+
+  void EGOPlannerManager::setDroneIdtoOpt()
+  {
+    // Implementation of setDroneIdtoOpt function
+  }
+
 } // namespace ego_planner
