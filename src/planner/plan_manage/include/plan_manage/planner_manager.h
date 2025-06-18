@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <stdlib.h>
@@ -41,6 +40,10 @@ namespace ego_planner
         const Eigen::Vector3d &start_pos, const Eigen::Vector3d &start_vel,
         const Eigen::Vector3d &start_acc, const std::vector<Eigen::Vector3d> &waypoints,
         const Eigen::Vector3d &end_vel, const Eigen::Vector3d &end_acc);
+    bool planGlobalTrajForSwarm(const Eigen::Vector3d &start_pos, const Eigen::Vector3d &start_vel,
+                                const Eigen::Vector3d &start_acc, const Eigen::Vector3d &end_pos,
+                                const Eigen::Vector3d &end_vel, const Eigen::Vector3d &end_acc,
+                                const int uav_id);
     void getLocalTarget(
         const double planning_horizen,
         const Eigen::Vector3d &start_pt, const Eigen::Vector3d &global_end_pt,

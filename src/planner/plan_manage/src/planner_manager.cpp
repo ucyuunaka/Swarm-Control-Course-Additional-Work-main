@@ -57,10 +57,8 @@ namespace ego_planner
       Eigen::Matrix3d headState, tailState;
       Eigen::MatrixXd innerPs;
       Eigen::VectorXd piece_dur_vec;
-      int piece_nums;
       poly_traj::Trajectory traj;
       vector<Eigen::Vector3d> simple_path;
-      constexpr double init_of_init_totaldur = 2.0;
 
       headState << start_pt, start_vel, start_acc;
       tailState << local_target_pt, local_target_vel, Eigen::Vector3d::Zero();
@@ -327,7 +325,7 @@ namespace ego_planner
     if (waypoints.size() > 1)
     {
       innerPts.resize(3, waypoints.size() - 1);
-      for (int i = 0; i < waypoints.size() - 1; i++)
+      for (size_t i = 0; i < waypoints.size() - 1; i++)
         innerPts.col(i) = waypoints[i];
     }
     else
@@ -391,11 +389,6 @@ namespace ego_planner
     }
 
     return success;
-  }
-
-  void EGOPlannerManager::setDroneIdtoOpt()
-  {
-    // Implementation of setDroneIdtoOpt function
   }
 
 } // namespace ego_planner
