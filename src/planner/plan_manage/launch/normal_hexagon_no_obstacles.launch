@@ -41,7 +41,7 @@
     <!-- swarm robots -->
     <include file="$(find ego_planner)/launch/run_in_sim.launch">
     
-        <arg name="drone_id" value="0"/>
+        <arg name="drone_id" value="7"/>
 
         <arg name="init_x" value="-23.0"/>
         <arg name="init_y" value="2.0"/>
@@ -60,7 +60,7 @@
 
     
     <include file="$(find ego_planner)/launch/run_in_sim.launch">
-        <arg name="drone_id" value="1"/>
+        <arg name="drone_id" value="6"/>
 
         <arg name="init_x" value="-25.0"/>
         <arg name="init_y" value="4.0"/>
@@ -78,7 +78,7 @@
     </include>
 
     <include file="$(find ego_planner)/launch/run_in_sim.launch">
-        <arg name="drone_id" value="2"/>
+        <arg name="drone_id" value="5"/>
 
         <arg name="init_x" value="-27.0"/>
         <arg name="init_y" value="4.0"/>
@@ -96,7 +96,7 @@
     </include>
 
     <include file="$(find ego_planner)/launch/run_in_sim.launch">
-        <arg name="drone_id" value="3"/>
+        <arg name="drone_id" value="4"/>
 
         <arg name="init_x" value="-29.0"/>
         <arg name="init_y" value="2.0"/>
@@ -114,7 +114,7 @@
     </include>
     
     <include file="$(find ego_planner)/launch/run_in_sim.launch">
-        <arg name="drone_id" value="4"/>
+        <arg name="drone_id" value="3"/>
 
         <arg name="init_x" value="-23.0"/>
         <arg name="init_y" value="-2.0"/>
@@ -132,7 +132,7 @@
     </include>
 
     <include file="$(find ego_planner)/launch/run_in_sim.launch">
-        <arg name="drone_id" value="5"/>
+        <arg name="drone_id" value="2"/>
 
         <arg name="init_x" value="-25.0"/>
         <arg name="init_y" value="-4.0"/>
@@ -150,7 +150,7 @@
     </include>
 
     <include file="$(find ego_planner)/launch/run_in_sim.launch">
-        <arg name="drone_id" value="6"/>
+        <arg name="drone_id" value="1"/>
 
         <arg name="init_x" value="-27.0"/>
         <arg name="init_y" value="-4.0"/>
@@ -167,7 +167,7 @@
     </include>
 
     <include file="$(find ego_planner)/launch/run_in_sim.launch">
-        <arg name="drone_id" value="7"/>
+        <arg name="drone_id" value="0"/>
 
         <arg name="init_x" value="-29.0"/>
         <arg name="init_y" value="-2.0"/>
