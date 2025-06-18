@@ -79,25 +79,17 @@ namespace ego_planner
 
     // 自动队形切换功能初始化
     nh.param("formation_switch/enable", enable_auto_formation_switch_, false);
-    nh.param("formation_switch/interval", formation_switch_interval_, 20.0); // 默认20秒间隔
-
     if (enable_auto_formation_switch_)
     {
-      // 设置队形切换序列：S(2)->Y(3)->S(2)->U(4)
-      formation_sequence_ = {2, 3, 2, 4}; // S -> Y -> S -> U
-      current_formation_type_ = 2;        // 初始为S型
-      next_formation_index_ = 1;          // 下一个是Y型（索引1）
-      formation_switch_in_progress_ = false;
+      nh.param("formation_switch/interval", formation_switch_interval_, 20.0);
+      formation_sequence_ = {2, 3, 2, 4}; // S, Y, S, U
+      next_formation_index_ = 0;
       last_formation_switch_time_ = ros::Time::now();
 
-      // 创建队形切换定时器
-      formation_switch_timer_ = nh.createTimer(
-          ros::Duration(formation_switch_interval_),
-          &EGOReplanFSM::formationSwitchTimerCallback,
-          this);
+      formation_switch_timer_ = nh.createTimer(ros::Duration(1.0), &EGOReplanFSM::formationSwitchTimerCallback, this);
 
-      ROS_INFO("[DEBUG] 自动队形切换功能已启用，切换间隔: %.1f秒", formation_switch_interval_);
-      ROS_INFO("[DEBUG] 队形切换序列: S->Y->S->U");
+      ROS_INFO("[FSM] Auto formation switch enabled, interval: %.1fs", formation_switch_interval_);
+      ROS_INFO("[FSM] Formation sequence: S->Y->S->U");
     }
 
     /* callback */
@@ -274,31 +266,19 @@ namespace ego_planner
       {
         if (t_cur > info->duration - 0.2)
         {
-          have_target_ = false;
-          have_local_traj_ = false;
-
           /* The navigation task completed */
           if (enable_auto_formation_switch_)
           {
+            ROS_INFO("[FSM] Reached target, switching to AUTO_FORMATION_SWITCH state.");
             changeFSMExecState(AUTO_FORMATION_SWITCH, "FSM");
           }
           else
           {
+            ROS_INFO("[FSM] Reached target, switching to WAIT_TARGET state.");
+            have_target_ = false;
+            have_local_traj_ = false;
             changeFSMExecState(WAIT_TARGET, "FSM");
           }
-
-          result_file_ << planner_manager_->pp_.drone_id << "\t" << (ros::Time::now() - planner_manager_->global_start_time_).toSec() << "\t" << planner_manager_->average_plan_time_ << "\n";
-
-          printf("\033[47;30m\n[drone %d reached goal]==============================================\033[0m\n",
-                 planner_manager_->pp_.drone_id);
-          std_msgs::Bool msg;
-          msg.data = true;
-          reached_pub_.publish(msg);
-          goto force_return;
-        }
-        else if ((end_pt_ - pos).norm() > no_replan_thresh_ && t_cur > replan_thresh_)
-        {
-          changeFSMExecState(REPLAN_TRAJ, "FSM");
         }
       }
       else if (t_cur > replan_thresh_)
@@ -311,18 +291,23 @@ namespace ego_planner
 
     case AUTO_FORMATION_SWITCH:
     {
-      // 等待队形切换触发或继续等待
-      if (!formation_switch_in_progress_)
+      // 在这里，我们等待定时器触发下一次队形切换
+      // switchToNextFormation() 将被 formationSwitchTimerCallback 调用
+      if (formation_switch_in_progress_)
       {
-        // 没有队形切换正在进行，继续等待
-        goto force_return;
-      }
-      else
-      {
-        // 队形切换已触发，设置目标为当前位置并开始规划
+        // 如果正在切换，则重新规划轨迹
         setTargetToCurrentPosition();
-        changeFSMExecState(SEQUENTIAL_START, "FORMATION_SWITCH");
-        formation_switch_in_progress_ = false;
+        if (planFromGlobalTraj(1))
+        {
+          changeFSMExecState(EXEC_TRAJ, "FSM");
+          formation_switch_in_progress_ = false; // 重置标志
+          ROS_INFO("[FSM] New trajectory for formation switch planned. Executing...");
+        }
+        else
+        {
+          ROS_WARN("[FSM] Failed to plan trajectory for formation switch.");
+          changeFSMExecState(WAIT_TARGET, "FSM"); // 失败则返回等待状态
+        }
       }
       break;
     }
@@ -957,7 +942,8 @@ namespace ego_planner
     {
       if (exec_state_ == AUTO_FORMATION_SWITCH && !formation_switch_in_progress_)
       {
-        ROS_INFO("[DEBUG] 触发队形切换，从 %d 切换到 %d",
+        ROS_INFO("[FSM] Timer: It's time to switch formation!");
+        ROS_INFO("[FSM] Triggering formation switch from %d to %d",
                  current_formation_type_, formation_sequence_[next_formation_index_]);
 
         switchToNextFormation();
@@ -972,7 +958,7 @@ namespace ego_planner
     // 获取下一个队形类型
     int new_formation_type = formation_sequence_[next_formation_index_];
 
-    ROS_INFO("[DEBUG] 切换到队形类型: %d", new_formation_type);
+    ROS_INFO("[FSM] Switching to formation type: %d", new_formation_type);
 
     // 更新队形和可视化
     updateFormationAndVisualization(new_formation_type);
@@ -1085,7 +1071,7 @@ namespace ego_planner
 
     planner_manager_->ploy_traj_opt_->setDesiredFormationFromConfig(relative_positions);
 
-    ROS_INFO("[DEBUG] 队形 %d 配置已更新", formation_type);
+    ROS_INFO("[FSM] Formation %d config updated.", formation_type);
   }
 
   void EGOReplanFSM::setTargetToCurrentPosition()
@@ -1112,7 +1098,7 @@ namespace ego_planner
     // 计算新的目标位置
     end_pt_ = swarm_central_pos_ + swarm_scale_ * relative_pos;
 
-    ROS_INFO("[DEBUG] Drone %d 设置原地切换目标: 中心位置(%.2f, %.2f, %.2f), 目标位置(%.2f, %.2f, %.2f)",
+    ROS_INFO("[FSM] Drone %d set target for in-place switch: center(%.2f, %.2f, %.2f), target(%.2f, %.2f, %.2f)",
              id, swarm_central_pos_(0), swarm_central_pos_(1), swarm_central_pos_(2),
              end_pt_(0), end_pt_(1), end_pt_(2));
 

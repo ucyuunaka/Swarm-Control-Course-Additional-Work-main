@@ -631,10 +631,10 @@ namespace ego_planner
     // 更新内部队形类型
     formation_type_ = formation_type;
 
-    // 重新初始化连线配置
+    // 重新初始化（清除旧的连线并根据新类型创建）
     initSwarmGraphVisual();
 
-    ROS_INFO("[DEBUG] 队形可视化已更新为类型: %d", formation_type);
+    ROS_INFO("[VIS] Formation visualization updated to type: %d", formation_type);
   }
 
 } // namespace ego_planner
