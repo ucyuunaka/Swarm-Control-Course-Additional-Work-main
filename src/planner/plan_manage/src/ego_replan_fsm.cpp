@@ -869,7 +869,7 @@ namespace ego_planner
 
   bool EGOReplanFSM::planFromLocalTraj(bool flag_use_poly_init, bool use_formation)
   {
-    double t_debug_start = ros::Time::now().toSec();
+    // double t_debug_start = ros::Time::now().toSec();
     LocalTrajData *info = &planner_manager_->traj_.local_traj;
     double t_cur = ros::Time::now().toSec() - info->start_time;
 
@@ -986,9 +986,6 @@ namespace ego_planner
 
   void EGOReplanFSM::updateFormationAndVisualization(int formation_type)
   {
-    // 更新优化器中的队形类型
-    planner_manager_->ploy_traj_opt_->setDesiredFormation(formation_type);
-
     // 更新可视化连线
     visualization_->updateFormationType(formation_type);
 
@@ -1085,6 +1082,8 @@ namespace ego_planner
       relative_positions[i][2] = swarm_relative_pts_[i][2];
     }
     planner_manager_->setFormationFromConfig(relative_positions);
+
+    planner_manager_->ploy_traj_opt_->setDesiredFormationFromConfig(relative_positions);
 
     ROS_INFO("[DEBUG] 队形 %d 配置已更新", formation_type);
   }
