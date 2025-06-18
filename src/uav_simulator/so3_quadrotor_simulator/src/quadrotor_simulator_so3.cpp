@@ -213,13 +213,14 @@ int main(int argc, char **argv)
   boost::function<void(const quadrotor_msgs::SO3Command::ConstPtr &)> cmd_callback_bound =
       boost::bind(cmd_callback, _1, &command);
   ros::Subscriber cmd_sub =
-      n.subscribe("cmd", 100, cmd_callback_bound, ros::TransportHints().tcpNoDelay());
+      n.subscribe("cmd", 100, cmd_callback_bound, ros::VoidConstPtr(), ros::TransportHints().tcpNoDelay());
 
   boost::function<void(const geometry_msgs::Vector3::ConstPtr &)> disturb_callback_bound =
       boost::bind(disturb_callback, _1, &disturbance);
   ros::Subscriber disturb_sub =
       n.subscribe("force_disturbance", 100,
                   disturb_callback_bound,
+                  ros::VoidConstPtr(),
                   ros::TransportHints().tcpNoDelay());
 
   boost::function<void(const geometry_msgs::Vector3::ConstPtr &)> disturb_moment_callback_bound =
@@ -227,6 +228,7 @@ int main(int argc, char **argv)
   ros::Subscriber disturb_moment_sub =
       n.subscribe("moment_disturbance", 100,
                   disturb_moment_callback_bound,
+                  ros::VoidConstPtr(),
                   ros::TransportHints().tcpNoDelay());
 
   QuadrotorSimulator::Quadrotor quad;
