@@ -2,11 +2,7 @@
 <launch>
   <arg name="formation_type" default="2"/>
   
-  <!-- 地图和仿真环境 -->
   <include file="$(find mockamap)/launch/mockamap.launch"/>
-  
-  <!-- RVIZ可视化 -->
-  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find ego_planner)/config/rviz_config.rviz"/>
   
   <include file="$(find ego_planner)/launch/advanced_param_auto_formation_switch.xml">
     <arg name="formation_type" value="$(arg formation_type)" />
