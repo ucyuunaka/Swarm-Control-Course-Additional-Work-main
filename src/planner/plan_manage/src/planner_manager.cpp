@@ -376,8 +376,25 @@ namespace ego_planner
     ROS_INFO("[PlannerManager] Drone %d trajectory optimization input: Start=[%.2f,%.2f,%.2f], End=[%.2f,%.2f,%.2f]",
              uav_id, start_pos.x(), start_pos.y(), start_pos.z(), end_pos.x(), end_pos.y(), end_pos.z());
 
-    bool success = ploy_traj_opt_->optimizeTrajectory(start_pos, start_vel, start_acc,
-                                                      end_pos, end_vel, end_acc);
+    // Create trajectory optimization using proper function
+    Eigen::Matrix<double, 3, 3> headState, tailState;
+    headState << start_pos, start_vel, start_acc;
+    tailState << end_pos, end_vel, end_acc;
+
+    // Generate simple straight line trajectory for inner points
+    Eigen::MatrixXd innerPts(3, 1);
+    innerPts.col(0) = (start_pos + end_pos) / 2.0;
+
+    // Set time duration
+    Eigen::VectorXd time_vec(2);
+    double total_dist = (end_pos - start_pos).norm();
+    double time_per_segment = std::max(total_dist / pp_.max_vel_, 1.0);
+    time_vec << time_per_segment, time_per_segment;
+
+    // Use the correct function name
+    bool success = ploy_traj_opt_->OptimizeTrajectory_lbfgs(headState, tailState,
+                                                            innerPts, time_vec,
+                                                            innerPts, true);
 
     if (!success)
     {
