@@ -16,7 +16,7 @@ global_goal:
 # 自动队形切换设置
 formation_switch:
   enable: true                # 启用自动队形切换
-  interval: 20.0              # 切换间隔（秒）
+  interval: 6.0              # 切换间隔（秒）
 
 optimization:
   formation_type      : 2     # 初始队形类型（S型）
