@@ -1,6 +1,7 @@
 // #include <fstream>
 #include <plan_manage/planner_manager.h>
 #include <thread>
+#include <cmath>                       // for std::isnan and std::isinf
 #include "visualization_msgs/Marker.h" // zx-todo
 
 namespace ego_planner
@@ -382,19 +383,48 @@ namespace ego_planner
     tailState << end_pos, end_vel, end_acc;
 
     // Generate simple straight line trajectory for inner points
-    Eigen::MatrixXd innerPts(3, 1);
-    innerPts.col(0) = (start_pos + end_pos) / 2.0;
+    Eigen::MatrixXd innerPts(3, 2);
+    innerPts.col(0) = start_pos + 0.33 * (end_pos - start_pos);
+    innerPts.col(1) = start_pos + 0.67 * (end_pos - start_pos);
 
-    // Set time duration
-    Eigen::VectorXd time_vec(2);
+    // Set time duration for 3 segments
+    Eigen::VectorXd time_vec(3);
     double total_dist = (end_pos - start_pos).norm();
-    double time_per_segment = std::max(total_dist / pp_.max_vel_, 1.0);
-    time_vec << time_per_segment, time_per_segment;
+    double time_per_segment = std::max(total_dist / pp_.max_vel_ / 3.0, 0.5);
+    time_vec << time_per_segment, time_per_segment, time_per_segment;
 
-    // Use the correct function name
+    Eigen::MatrixXd optimal_points;
+
+    // Use the correct function name and parameters
     bool success = ploy_traj_opt_->OptimizeTrajectory_lbfgs(headState, tailState,
                                                             innerPts, time_vec,
-                                                            innerPts, true);
+                                                            optimal_points, true);
+
+    // Add data validation to prevent RVIZ crash
+    if (success && optimal_points.size() > 0)
+    {
+      // Check for NaN values
+      bool has_nan = false;
+      for (int i = 0; i < optimal_points.rows(); ++i)
+      {
+        for (int j = 0; j < optimal_points.cols(); ++j)
+        {
+          if (std::isnan(optimal_points(i, j)) || std::isinf(optimal_points(i, j)))
+          {
+            has_nan = true;
+            break;
+          }
+        }
+        if (has_nan)
+          break;
+      }
+
+      if (has_nan)
+      {
+        ROS_ERROR("[PlannerManager] Trajectory contains NaN/Inf values! Rejecting to prevent RVIZ crash.");
+        success = false;
+      }
+    }
 
     if (!success)
     {
