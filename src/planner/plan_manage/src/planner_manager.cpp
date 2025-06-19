@@ -1,8 +1,8 @@
 // #include <fstream>
 #include <plan_manage/planner_manager.h>
 #include <thread>
-#include <cmath>                       // for std::isnan and std::isinf
-#include "visualization_msgs/Marker.h" // zx-todo
+#include <cmath> 
+#include "visualization_msgs/Marker.h"
 
 namespace ego_planner
 {
